@@ -9,6 +9,7 @@ const dbUrl = process.env.DB_URI || "mongodb://127.0.0.1";
 const dbClient = new MongoClient(dbUrl);
 
 var services = function(app) {
+    //POST - server side for adding spells
     app.post('/add-spell', async function(req, res) {
         var newSpell = {
             name: req.body.name,
@@ -41,6 +42,7 @@ var services = function(app) {
         }
     });
 
+    //GET - server side retrieve spells
     app.get('/get-spells', async function(req, res) {
         try {
             const conn = await dbClient.connect();
@@ -58,6 +60,7 @@ var services = function(app) {
         }
     });
 
+    //GET (by type) - server side for getting spells by type
     app.get("/get-spellsByType", async function(req, res) {
         var search = (req.query.type === "") ? {} : { type: req.query.type };
 
@@ -77,10 +80,12 @@ var services = function(app) {
         }
     });
 
+    //PUT - server side for updating spells
     app.put('/update-spell', async function(req, res) {
         
     });
 
+    //DELETE - server side for deleteing spells
     app.delete('/delete-spell', async function(req, res) {
         
     });
