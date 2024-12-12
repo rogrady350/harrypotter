@@ -37,7 +37,7 @@ var services = function(app) {
                 return res.send(JSON.stringify({ msg: "SUCCESS" }));
             }
         } catch (error) {
-            await conn.close();
+            //await conn.close();
             return res.send(JSON.stringify({ msg: "Error" + error }));
         }
     });
@@ -55,7 +55,7 @@ var services = function(app) {
 
             return res.send(JSON.stringify({ msg: "SUCCESS", spells: data }));
         } catch (error) {
-            await conn.close();
+            //await conn.close();
             return res.send(JSON.stringify({ msg: "Error" + error }));
         }
     });
@@ -75,19 +75,58 @@ var services = function(app) {
 
             return res.send(JSON.stringify({ msg: "SUCCESS", spells: data }));
         } catch (error) {
-            await conn.close();
+            //await conn.close();
             return res.send(JSON.stringify({ msg: "Error" + error }));
         }
     });
 
     //PUT - server side for updating spells
     app.put('/update-spell', async function(req, res) {
-        
+        var updateData = {
+            $set: {
+                name: req.body.name,
+                type: req.body.type,
+                effect: req.body.effect,
+                "counter-spell": req.body.counterSpell
+            }
+        };
+
+        try {
+            const conn = await dbClient.connect();
+            const db = conn.db("harrypotter");
+            const coll = db.collection("spells");
+
+            const search = {_id: ObjectId.createFromHexString(req.body.ID)};
+
+            await coll.updateOne(search, updateData);
+
+            await conn.close();
+
+            return res.send(JSON.stringify({ msg: "SUCCESS" }));
+        } catch(err) {
+            console.log(err)
+            return res.send(JSON.stringify({ msg: "Error" + error }));
+        }
     });
 
     //DELETE - server side for deleteing spells
     app.delete('/delete-spell', async function(req, res) {
-        
+        try {
+            const conn = await dbClient.connect();
+            const db = conn.db("harrypotter");
+            const coll = db.collection("spells");
+
+            const search = {_id: ObjectId.createFromHexString(req.query.spellID)};
+
+            await coll.deleteOne(search);
+
+            await conn.close();
+
+            return res.send(JSON.stringify({msg: "SUCCESS"}));
+        } catch(err) {
+            console.log(err);
+            return res.send(JSON.stringify({ msg: "Error" + error }));
+        }
     });
 
     //For refreshing the spells table
